@@ -2,6 +2,7 @@
 library(dplyr)
 library(ggplot2)
 library(psych)
+library(lubridate)
 
 # Load data
 setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
@@ -35,8 +36,6 @@ flagged_df <- flagged_df %>%
 
 ## Transaction Locations
 
-library(dplyr)
-
 user_primary_location <- df %>%
   group_by(AccountID, Location) %>%
   summarise(txn_count = n(), .groups = "drop") %>%
@@ -56,8 +55,6 @@ df %>%
   summarise(count = n()) %>%
   mutate(percent = count / sum(count))
 
-library(ggplot2)
-
 ggplot(df, aes(x = OutOfPatternLocation, fill = OutOfPatternLocation)) +
   geom_bar() +
   labs(title = "Transactions in vs. Outside Primary Location",
@@ -67,8 +64,6 @@ ggplot(df, aes(x = OutOfPatternLocation, fill = OutOfPatternLocation)) +
   theme_classic()
 
 # Are these outside of primary transactions unrealistic?
-library(dplyr)
-library(lubridate)
 
 # Ensure TransactionDate is in datetime format
 df$TransactionDate <- as.POSIXct(df$TransactionDate)
@@ -89,7 +84,7 @@ df <- df %>%
 # How many suspicious jumps?
 table(df$GeoVelocityFlag)
 
-# See examples
+# Take a look at the df! 
 df %>%
   filter(GeoVelocityFlag) %>%
   select(AccountID, TransactionDate, PrevTime, Location, PrevLocation, TimeDiffHours)
@@ -130,5 +125,5 @@ ggplot(top10, aes(x = reorder(AccountID, NumJumps), y = NumJumps)) +
     x = "Account ID",
     y = "Number of Suspicious Jumps"
   ) +
-  theme_minimal()
+  theme_bw()
 
